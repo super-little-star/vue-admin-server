@@ -4,6 +4,14 @@ var strTool = require("../tool/stringTool");
 var Info = {};
 
 Info.addFirstCategory = function(data,res){
+    if(data.txt.length >10){
+        res.send({
+            result:false,
+            message:"修改不得超过10个字符",
+            resCode:1006
+        })
+        return;
+    }
     let sqlstr = strTool.format(
         "select * from Category where userId = '?' and txt = '?'",
         data.userId,
@@ -61,19 +69,30 @@ Info.getCategory = function(userId,res){
 }
 
 Info.reviseCategory = function(data,res){
-    let sqlstr = strTool.format(
-        "update Category set txt = '?' where id = '?'",
-        data.txt,
-        data.id
-    );
-    mssql.sql(sqlstr,(err,result)=>{
-        if(err){console.log(err);return;}
-    });
-    res.send({
-        result:true,
-        message:"修改成功",
-        resCode:0
-    })
+    if(data.txt.length >10){
+        res.send({
+            result:false,
+            message:"修改不得超过10个字符",
+            resCode:1006
+        })
+        return;
+    }
+    else{
+        let sqlstr = strTool.format(
+            "update Category set txt = '?' where id = '?'",
+            data.txt,
+            data.id
+        );
+        mssql.sql(sqlstr,(err,result)=>{
+            if(err){console.log(err);return;}
+        });
+        res.send({
+            result:true,
+            message:"修改成功",
+            resCode:0
+        })
+    }
+    
 }
 
 Info.removeCategory = function(id,res){
