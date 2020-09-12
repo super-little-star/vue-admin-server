@@ -52,6 +52,7 @@ app.post('/getSms',async function(req,res){
   await login.checkUserRepeat(data,res)
 })
 
+
 app.options('/register',function(req,res){
   
   res.send({
@@ -66,6 +67,7 @@ app.post('/register',function(req,res){
   res.send(result);
 })
 
+
 app.options("/getLogin",function(req,res){
   res.send({
     result:true,
@@ -76,6 +78,7 @@ app.options("/getLogin",function(req,res){
 app.post("/getLogin",function(req,res){
   login.checkLogin(req.body,res);
 })
+
 
 app.options("/news/addFirstCategory",function(req,res){
   res.send({
@@ -92,6 +95,7 @@ app.post("/news/addFirstCategory",function(req,res){
   info.addFirstCategory(data,res);
 })
 
+
 app.options("/news/getCategory",function(req,res){
   res.send({
     result:true,
@@ -101,6 +105,28 @@ app.options("/news/getCategory",function(req,res){
 })
 app.post("/news/getCategory",function(req,res){
   info.getCategory(req.headers.userid,res);
+})
+
+app.options("/news/reviseCategory",function(req,res){
+  res.send({
+    result:true,
+    message:"",
+    resCode:0
+  });
+})
+app.post("/news/reviseCategory",function(req,res){
+  info.reviseCategory(req.body,res);
+})
+
+app.options("/news/removeCategory",function(req,res){
+  res.send({
+    result:true,
+    message:"",
+    resCode:0
+  });
+})
+app.post("/news/removeCategory",function(req,res){
+  info.removeCategory(req.body.id,res);
 })
 
 // catch 404 and forward to error handler

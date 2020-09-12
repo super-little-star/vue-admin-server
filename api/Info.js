@@ -60,4 +60,35 @@ Info.getCategory = function(userId,res){
     })
 }
 
+Info.reviseCategory = function(data,res){
+    let sqlstr = strTool.format(
+        "update Category set txt = '?' where id = '?'",
+        data.txt,
+        data.id
+    );
+    mssql.sql(sqlstr,(err,result)=>{
+        if(err){console.log(err);return;}
+    });
+    res.send({
+        result:true,
+        message:"修改成功",
+        resCode:0
+    })
+}
+
+Info.removeCategory = function(id,res){
+    let sqlstr = strTool.format(
+        "delete from Category where id = '?'",
+        id
+    );
+    mssql.sql(sqlstr,(err,result)=>{
+        if(err){console.log(err);return;}
+    });
+    res.send({
+        result:true,
+        message:"删除成功",
+        resCode:0
+    })
+}
+
 module.exports = Info;
