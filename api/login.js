@@ -101,12 +101,15 @@ login.checkLogin = async function(data,res){
         let r = result.recordset;
         if(r.length>0){
             if(r[0].password === md5(data.password)){
-                let token = tokent.GetToken(r[0]);
+                let token = tokent.GetToken({
+                    userId:r[0].id,
+                    userEmail:r[0].userEmail,
+                });
                 res.send({
                     result:true,
                     message:"登录成功",
                     data:{
-                        id:r[0].id,
+                        userId:r[0].id,
                         userEmail:r[0].userEmail,
                         token
                     },

@@ -8,7 +8,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var login = require("./api/login");
-var tokent = require("./tool/tokenTool")
+var info = require("./api/Info");
 
 var app = express();
 
@@ -69,14 +69,39 @@ app.post('/register',function(req,res){
 app.options("/getLogin",function(req,res){
   res.send({
     result:true,
-    message:""
+    message:"",
+    resCode:0
   });
 })
 app.post("/getLogin",function(req,res){
   login.checkLogin(req.body,res);
 })
 
+app.options("/news/addFirstCategory",function(req,res){
+  res.send({
+    result:true,
+    message:"",
+    resCode:0
+  });
+})
+app.post("/news/addFirstCategory",function(req,res){
+  let data = {
+    txt:req.body.categoryName,
+    userId:req.headers.userid
+  }
+  info.addFirstCategory(data,res);
+})
 
+app.options("/news/getCategory",function(req,res){
+  res.send({
+    result:true,
+    message:"",
+    resCode:0
+  });
+})
+app.post("/news/getCategory",function(req,res){
+  info.getCategory(req.headers.userid,res);
+})
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
