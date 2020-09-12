@@ -2,10 +2,14 @@ var jwt = require("jsonwebtoken");
 var tokent = {}
 
 const privateKey = "wdnmd";//加密字段
-const exp = 10; //有效期 s
+const exp = 180; //有效期 s
 
 tokent.GetToken = function (data){
-    return jwt.sign(data,privateKey,{expiresIn:exp});
+    let d = {
+        id:data.id,
+        userEmail:data.userEmail
+    }
+    return jwt.sign(d,privateKey,{expiresIn:exp});
 }
 
 tokent.CheckToken = function (token){

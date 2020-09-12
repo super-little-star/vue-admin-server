@@ -44,12 +44,14 @@ login.register = function(data){
         })
         return {
             result:true,
-            message:"注册成功"
+            message:"注册成功",
+            resCode:0
         }
     }
     else return{
         result:false,
-        message:"验证码不正确或者未发送"
+        message:"验证码不正确或者未发送",
+        resCode:1001
     }
 }
 //检查邮箱重复
@@ -69,14 +71,16 @@ login.checkUserRepeat = async function(data,res){
           if(result.recordset.length>0){
             res.send({
               result:false,
-              message:"该邮箱已注册"
+              message:"该邮箱已注册",
+              resCode:1002
             });
           }
           else{
             login.getCode(data.userEmail);
             res.send({
                 result:true,
-                message:"邮件发送成功"
+                message:"邮件发送成功",
+                resCode:0
             })
           }
         }
@@ -94,28 +98,33 @@ login.checkLogin = async function(data,res){
             console.log(err);
             return;
         }
-        if(result.recordset.length>0){
-            if(result.recordset[0].password === md5(data.password)){
-                let token = tokent.GetToken(data);
+        let r = result.recordset;
+        if(r.length>0){
+            if(r[0].password === md5(data.password)){
+                let token = tokent.GetToken(r[0]);
                 res.send({
                     result:true,
                     message:"登录成功",
                     data:{
-                        userEmail:data.userEmail,
+                        id:r[0].id,
+                        userEmail:r[0].userEmail,
                         token
-                    }
+                    },
+                    resCode:0
                 })
             }
             else{
                 res.send({
                     result:false,
-                    message:"密码不正确"
+                    message:"密码不正确",
+                    resCode:1003
                 })
             }
         }else{
             res.send({
                 result:false,
-                message:"用户邮箱不存在"
+                message:"用户邮箱不存在",
+                resCode:1004
             })
         }
     });
