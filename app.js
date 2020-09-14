@@ -129,6 +129,60 @@ app.post("/news/removeCategory",function(req,res){
   info.removeCategory(req.body.id,res);
 })
 
+app.options("/news/add",function(req,res){
+  res.send({
+    result:true,
+    message:"",
+    resCode:0
+  });
+})
+app.post("/news/add",function(req,res){
+  let data = {
+    categoryId:req.body.categoryId,
+    userId:req.headers.userid,
+    title:req.body.title,
+    content:req.body.content
+  }
+  info.addInfo(data,res);
+})
+
+app.options("/news/getInfo",function(req,res){
+  res.send({
+    result:true,
+    message:"",
+    resCode:0
+  });
+})
+app.post("/news/getInfo",function(req,res){
+  let d = {
+    userId:req.headers.userid,
+    page:req.body.page
+  }
+  info.getInfo(d,res);
+})
+
+app.options("/news/removeInfo",function(req,res){
+  res.send({
+    result:true,
+    message:"",
+    resCode:0
+  });
+})
+app.post("/news/removeInfo",function(req,res){
+  info.removeInfo(req.body.id,res);
+})
+
+app.options("/news/reviseInfo",function(req,res){
+  res.send({
+    result:true,
+    message:"",
+    resCode:0
+  });
+})
+app.post("/news/reviseInfo",function(req,res){
+  info.reviseInfo(req.body,res);
+})
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

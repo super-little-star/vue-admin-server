@@ -57,7 +57,7 @@ login.register = function(data){
 //检查邮箱重复
 login.checkUserRepeat = async function(data,res){
     let sqlstr = strTool.format(
-        "select * from [User] where userEmail = '?'",
+        "select top 1 * from [User] where userEmail = '?'",
         data.userEmail
     )
 
@@ -89,7 +89,7 @@ login.checkUserRepeat = async function(data,res){
 //登录检查
 login.checkLogin = async function(data,res){
     let sqlstr = strTool.format(
-        "select * from [User] where userEmail = '?'",
+        "select top 1 * from [User] where userEmail = '?'",
         data.userEmail
     )
 

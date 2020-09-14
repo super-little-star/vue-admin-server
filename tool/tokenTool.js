@@ -14,6 +14,7 @@ tokent.GetToken = function (data){
 
 tokent.CheckToken = function (token){
     let now = Date.now() / 1000;
+
     try{
         let dec = jwt.verify(token,privateKey)
         return dec.exp<now ? false : true;
