@@ -154,10 +154,8 @@ app.options("/news/getInfo",function(req,res){
   });
 })
 app.post("/news/getInfo",function(req,res){
-  let d = {
-    userId:req.headers.userid,
-    page:req.body.page
-  }
+  let d =req.body;
+  d["userId"]=req.headers.userid;
   info.getInfo(d,res);
 })
 

@@ -125,7 +125,7 @@ Info.addInfo = function(data,res){
     console.log(data);
     let sqlstr = strTool.format(
         "insert into Info (categoryId,userId,title,[content],date) values ('?','?','?','?','?')",
-        data.categoryId,data.userId,data.title,data.content,parseInt(Date.now().valueOf()/1000) 
+        data.categoryId,data.userId,data.title,data.content,parseInt(Date.now().valueOf()) 
     )
 
     mssql.sql(sqlstr,(err,result)=>{
@@ -150,9 +150,27 @@ Info.addInfo = function(data,res){
 }
 
 Info.getInfo = function(data,res){
+
+    let cdt = "";
+    
+    if(data.id!=null&&data.id!=""){
+        cdt += " and id = "+data.id;
+    }
+    else{
+        if(data.categoryId!=null && data.categoryId!="") cdt += " and categoryId = "+data.categoryId;
+        if(data.startTime!=null && data.endTime!=null) {
+            cdt+=strTool.format(" and date > ? and date <?",data.startTime,data.endTime);
+        }
+        if(data.title!=null && data.title!=""){
+            cdt+=strTool.format(" and title like '%?%'",data.title)
+        }
+    }
+    
+
     let sqlstr = strTool.format(
-        "select count(*) as count from Info where userId = '?'",
-        data.userId
+        "select count(*) as count from Info where userId = '?' ?",
+        data.userId,
+        cdt
     )
 
     mssql.sql(sqlstr,(e,r)=>{
@@ -160,8 +178,8 @@ Info.getInfo = function(data,res){
         let count = r.recordset[0].count;
         
         sqlstr = strTool.format(
-            "select * from Info where userId='?' order by id offset ? rows fetch next 10 rows only ",
-            data.userId,(data.page-1)*10
+            "select * from Info where userId='?' ? order by id offset ? rows fetch next 10 rows only ",
+            data.userId,cdt,(data.page-1)*10
         )
 
         mssql.sql(sqlstr,(e1,r1)=>{
@@ -182,8 +200,8 @@ Info.getInfo = function(data,res){
 
 Info.removeInfo = function(id,res){
     let sqlstr = strTool.format(
-        "delete from Info where id = '?'",
-        id
+        "delete from Info where id in (?)",
+        id.toString()
     );
     mssql.sql(sqlstr,(err,result)=>{
         if(err){console.log(err);return;}
