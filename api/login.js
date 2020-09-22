@@ -8,15 +8,29 @@ var tokent = require("../tool/tokenTool")
 var login = {};
 var codeList = [];
 
-setInterval(codeTimer, 1000);
+var codeExp = 60;
+
 //获取验证码
 login.getCode = function(to){
     let getcode = random.GetCode();
-    codeList.push({
-        code:getcode,
-        userEmail:to,
-        timer:60
-    })
+    let date = Date.now().valueOf();
+    let expIn = date + codeExp*1000;
+
+    let item = codeList.find(i=>{i.userEmail==expIn});
+    if(item == null){
+        codeList.push({
+            code:getcode,
+            userEmail:to,
+            expIn:expIn
+        })
+    }
+    else{
+        item.code=getcode;
+        item.expIn=expIn
+    }
+
+    
+    console.log(codeList);
     let mailHtml = strTool.format(
         "<div><style type='text/css'>.table{width:400px;background:#17212e;margin:auto;font-family:'MicrosoftYahei';padding:0 50px 20px 50px;}.title{height:100px;width:100%;color:#66c0f4;font-size:30px;font-weight:bold;line-height:100px;}.content{width:100%;color:#c6d4df;font-size:19px;line-height:30px;}.code{margin-top:10px;font-size:30px;color:#66c0f4;font-weight:bold;}.tips{margin:20px 0px;background:#121a25;padding:10px 20px;font-size:14px;line-height:initial;}</style><div class='table'><div class='title'>邮箱验证</div><div class='content'>尊敬的用户：<br />以下是你使用<u>?</u>邮箱注册Managment账号的验证码:<div class='code'>?</div><div class='tips'>要完成注册，您将需要注册验证码。无人可以在不访问这封电子邮件的前提下注册您的帐户。该验证码有效时间为60s<br /><br />如果您未曾试图注册，请忽略这封邮件，并留意您的电子邮件账户是否泄漏，确保您的帐户安全。</div></div></div><br /></div>",
         to,
@@ -50,7 +64,7 @@ login.register = function(data){
     }
     else return{
         result:false,
-        message:"验证码不正确或者未发送",
+        message:"验证码不正确或者已过期",
         resCode:1001
     }
 }
@@ -137,25 +151,20 @@ login.checkLogin = async function(data,res){
 //检查验证码
 function checkCode(userEmail,code){
     code = code.toUpperCase();
-    let item = codeList.find(i=>{
-        return i.userEmail == userEmail;
+    let i = codeList.findIndex(t=>{
+        return t.userEmail == userEmail;
     });
-    if(item==null) return false;
+    let result = false;
+    if(i==-1) result = false;
+    else if(codeList[i].code == code && codeList[i].expIn>Date.now().valueOf()){result = true;codeList.splice(i,1);}
+    else result = false
 
-    if(item.code == code)return true
-    else return false
+    
+
+    return result;
 
 }
-//验证码有效性计时
-function codeTimer(){
-    if(codeList.length<=0)return;
-    codeList.forEach(c => {
-        c.timer--
-    });
-    codeList = codeList.filter(i=>{
-        return i.timer>0;
-    });
-}
+
 
 
 module.exports = login;

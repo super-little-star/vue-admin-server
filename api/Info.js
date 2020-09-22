@@ -1,10 +1,26 @@
 var mssql = require("../tool/mssqldb");
 var strTool = require("../tool/stringTool");
 var dateTool = require("../tool/dateTool")
+var tokenTool = require("../tool/tokenTool")
 
 var Info = {};
 
+var checktoken = function(data,res){
+    if(!tokenTool.CheckToken(data.token)){
+        res.send({
+            result:false,
+            message:"token失效",
+            resCode:1007
+        })
+        return false;
+    }
+    return true;
+}
+
 Info.addFirstCategory = function(data,res){
+
+    if(!checktoken(data,res))return;
+
     if(data.txt.length >10){
         res.send({
             result:false,
@@ -57,10 +73,13 @@ Info.addFirstCategory = function(data,res){
     })
 }
 
-Info.getCategory = function(userId,res){
+Info.getCategory = function(data,res){
+
+    if(!checktoken(data,res))return;
+
     let sqlstr = strTool.format(
         "select * from Category where userId = '?'",
-        userId
+        data.userId
     );
 
     mssql.sql(sqlstr,(err,result)=>{
@@ -80,6 +99,9 @@ Info.getCategory = function(userId,res){
 }
 
 Info.reviseCategory = function(data,res){
+
+    if(!checktoken(data,res))return;
+
     if(data.txt.length >10){
         res.send({
             result:false,
@@ -90,39 +112,66 @@ Info.reviseCategory = function(data,res){
     }
     else{
         let sqlstr = strTool.format(
-            "update Category set txt = '?' where id = '?'",
+            "update Category set txt = '?' where id = '?' and userId = '?'",
             data.txt,
-            data.id
+            data.id,
+            data.userId
         );
         mssql.sql(sqlstr,(err,result)=>{
             if(err){console.log(err);return;}
+            if(result.rowsAffected[0]>0){
+                res.send({
+                    result:true,
+                    message:"修改成功",
+                    resCode:0
+                })
+            }
+            else{
+                res.send({
+                    result:true,
+                    message:"分类不存在",
+                    resCode:1009
+                })
+            }
         });
-        res.send({
-            result:true,
-            message:"修改成功",
-            resCode:0
-        })
     }
     
 }
 
-Info.removeCategory = function(id,res){
+Info.removeCategory = function(data,res){
+
+    if(!checktoken(data,res))return;
+
     let sqlstr = strTool.format(
-        "delete from Category where id = '?'",
-        id
+        "delete from Category where id = '?' and userId='?'",
+        data.id,
+        data.userId
     );
     mssql.sql(sqlstr,(err,result)=>{
         if(err){console.log(err);return;}
+        if(result.rowsAffected[0]>0){
+            res.send({
+                result:true,
+                message:"删除成功",
+                resCode:0
+            })
+        }
+        else{
+            res.send({
+                result:true,
+                message:"分类不存在",
+                resCode:1009
+            })
+        }
+        
     });
-    res.send({
-        result:true,
-        message:"删除成功",
-        resCode:0
-    })
+    
 }
 
 Info.addInfo = function(data,res){
-    console.log(data);
+
+    if(!checktoken(data,res))return;
+
     let sqlstr = strTool.format(
         "insert into Info (categoryId,userId,title,[content],date) values ('?','?','?','?','?')",
         data.categoryId,data.userId,data.title,data.content,parseInt(Date.now().valueOf()) 
@@ -150,6 +199,8 @@ Info.addInfo = function(data,res){
 }
 
 Info.getInfo = function(data,res){
+
+    if(!checktoken(data,res))return;
 
     let cdt = "";
     
@@ -198,35 +249,64 @@ Info.getInfo = function(data,res){
     })
 }
 
-Info.removeInfo = function(id,res){
-    let sqlstr = strTool.format(
-        "delete from Info where id in (?)",
-        id.toString()
-    );
-    mssql.sql(sqlstr,(err,result)=>{
-        if(err){console.log(err);return;}
-    });
-    res.send({
-        result:true,
-        message:"删除成功",
-        resCode:0
-    })
-}
+Info.removeInfo = function(data,res){
+    if(!checktoken(data,res))return;
 
-Info.reviseInfo = function(data,res){
     let sqlstr = strTool.format(
-        "update Info set categoryId = '?',title='?',[content]='?' where id = '?'",
-        data.categoryId,data.title,data.content,data.id
+        "delete from Info where id in (?) and userId = '?'",
+        data.id.toString(),
+        data.userId
     );
     mssql.sql(sqlstr,(err,result)=>{
         if(err){console.log(err);return;}
-        res.send({
-            result:true,
-            message:"修改成功",
-            resCode:0
-        })
+        if(result.rowsAffected[0]>0){
+            res.send({
+                result:true,
+                message:"删除成功",
+                resCode:0
+            })
+        }
+        else{
+            res.send({
+                result:true,
+                message:"信息不存在",
+                resCode:1008
+            })
+        }
     });
     
 }
+
+Info.reviseInfo = function(data,res){
+
+    if(!checktoken(data,res))return;
+
+    let sqlstr = strTool.format(
+        "update Info set categoryId = '?',title='?',[content]='?' where id = '?' and userId='?'",
+        data.categoryId,data.title,data.content,data.id,data.userId
+    );
+    mssql.sql(sqlstr,(err,result)=>{
+        if(err){console.log(err);return;}
+
+        if(result.rowsAffected[0]>0){
+            res.send({
+                result:true,
+                message:"修改成功",
+                resCode:0
+            })
+        }
+        else{
+            res.send({
+                result:true,
+                message:"信息不存在",
+                resCode:1008
+            })
+        }
+        
+    });
+    
+}
+
+
 
 module.exports = Info;

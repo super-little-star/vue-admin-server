@@ -90,7 +90,8 @@ app.options("/news/addFirstCategory",function(req,res){
 app.post("/news/addFirstCategory",function(req,res){
   let data = {
     txt:req.body.categoryName,
-    userId:req.headers.userid
+    userId:req.headers.userid,
+    token:req.headers.token
   }
   info.addFirstCategory(data,res);
 })
@@ -104,7 +105,11 @@ app.options("/news/getCategory",function(req,res){
   });
 })
 app.post("/news/getCategory",function(req,res){
-  info.getCategory(req.headers.userid,res);
+  let d = {
+    userId:req.headers.userid,
+    token:req.headers.token
+  }
+  info.getCategory(d,res);
 })
 
 app.options("/news/reviseCategory",function(req,res){
@@ -115,7 +120,10 @@ app.options("/news/reviseCategory",function(req,res){
   });
 })
 app.post("/news/reviseCategory",function(req,res){
-  info.reviseCategory(req.body,res);
+  let d = req.body;
+  d["token"]=req.headers.token;
+  d["userId"]=req.headers.userid;
+  info.reviseCategory(d,res);
 })
 
 app.options("/news/removeCategory",function(req,res){
@@ -126,7 +134,12 @@ app.options("/news/removeCategory",function(req,res){
   });
 })
 app.post("/news/removeCategory",function(req,res){
-  info.removeCategory(req.body.id,res);
+  let d = {
+    id:req.body.id,
+    token:req.headers.token,
+    userId:req.headers.userid
+  }
+  info.removeCategory(d,res);
 })
 
 app.options("/news/add",function(req,res){
@@ -141,7 +154,8 @@ app.post("/news/add",function(req,res){
     categoryId:req.body.categoryId,
     userId:req.headers.userid,
     title:req.body.title,
-    content:req.body.content
+    content:req.body.content,
+    token:req.headers.token
   }
   info.addInfo(data,res);
 })
@@ -156,6 +170,7 @@ app.options("/news/getInfo",function(req,res){
 app.post("/news/getInfo",function(req,res){
   let d =req.body;
   d["userId"]=req.headers.userid;
+  d["token"]=req.headers.token;
   info.getInfo(d,res);
 })
 
@@ -167,7 +182,12 @@ app.options("/news/removeInfo",function(req,res){
   });
 })
 app.post("/news/removeInfo",function(req,res){
-  info.removeInfo(req.body.id,res);
+  let d = {
+    id:req.body.id,
+    token:req.headers.token,
+    userId:req.headers.userid
+  }
+  info.removeInfo(d,res);
 })
 
 app.options("/news/reviseInfo",function(req,res){
@@ -178,7 +198,10 @@ app.options("/news/reviseInfo",function(req,res){
   });
 })
 app.post("/news/reviseInfo",function(req,res){
-  info.reviseInfo(req.body,res);
+  let d = req.body;
+  d["token"]=req.headers.token;
+  d["userId"]=req.headers.userid;
+  info.reviseInfo(d,res);
 })
 
 // catch 404 and forward to error handler
