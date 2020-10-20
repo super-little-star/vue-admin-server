@@ -9,6 +9,7 @@ var usersRouter = require('./routes/users');
 
 var login = require("./api/login");
 var info = require("./api/Info");
+var userlist = require("./api/userList");
 
 var app = express();
 
@@ -95,7 +96,6 @@ app.post("/news/addFirstCategory",function(req,res){
   }
   info.addFirstCategory(data,res);
 })
-
 
 app.options("/news/getCategory",function(req,res){
   res.send({
@@ -202,6 +202,34 @@ app.post("/news/reviseInfo",function(req,res){
   d["token"]=req.headers.token;
   d["userId"]=req.headers.userid;
   info.reviseInfo(d,res);
+})
+
+app.options("/user/add",function(req,res){
+  res.send({
+    result:true,
+    message:"",
+    resCode:0
+  });
+})
+app.post("/user/add",function(req,res){
+  let d = req.body;
+  d["token"]=req.headers.token;
+  d["userId"]=req.headers.userid;
+  userlist.addUser(d,res);
+})
+
+app.options("/user/getList",function(req,res){
+  res.send({
+    result:true,
+    message:"",
+    resCode:0
+  });
+})
+app.post("/user/getList",function(req,res){
+  let d = req.body;
+  d["userId"]=req.headers.userid;
+  
+  userlist.getUser(d,res);
 })
 
 // catch 404 and forward to error handler

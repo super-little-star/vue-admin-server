@@ -44,7 +44,7 @@ db.sql = function (sql, callBack) {
             callback(err,null);
             return;
           }
-            callBack(err, result);
+          callBack(err, result);
         });
       });
     });
